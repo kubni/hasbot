@@ -23,12 +23,13 @@ executable hasbot
     main-is:          Main.hs
 
     -- Modules included in this executable, other than Main.
-    -- other-modules:
+    other-modules: HoogleCommands
 
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0,
                       text,
+                      aeson,
                       unliftio,
                       discord-haskell
     hs-source-dirs:   app
