@@ -3,16 +3,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module HoogleCommands (
-                        testCurl
-                      )
+  queryHoogleAPIFor
+)
 where
 
 import Data.Aeson
 import Data.Text
 import GHC.Generics
-import Network.Curl
-
-import Data.ByteString.Lazy.Char8 as BS
+import Network.HTTP.Simple
 
 data ModuleInfo = ModuleInfo {
                                 name :: String,
@@ -56,10 +54,8 @@ instance ToJSON HoogleJsonResponse where
   toEncoding = genericToEncoding defaultOptions
 
 
-testCurl = do
-  response <- curlGetString "https://hoogle.haskell.org?mode=json&hoogle=map&start=1&count=2" []
-  let jsonArrayString = snd response
-  -- let encodedJson = encode jsonArrayString
-  let byteStringJson = BS.pack jsonArrayString
-  let hoogleResponse = eitherDecode byteStringJson :: Either String [HoogleJsonResponse]
-  print hoogleResponse
+queryHoogleAPIFor :: String -> IO ()
+queryHoogleAPIFor funcName = do
+  response <- httpJSON "https://hoogle.haskell.org?mode=json&hoogle=map&start=1&count=2&format=text" :: IO (Response [HoogleJsonResponse])
+  let responseBody = getResponseBody response
+  print responseBody
