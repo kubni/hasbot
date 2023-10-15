@@ -31,6 +31,7 @@ executable hasbot
                       text,
                       aeson,
                       unliftio,
-                      discord-haskell
+                      discord-haskell,
+                      curl
     hs-source-dirs:   app
     default-language: Haskell2010

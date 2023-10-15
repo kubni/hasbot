@@ -9,6 +9,11 @@ import           Discord
 import           Discord.Types
 import qualified Discord.Requests as R
 
+import Data.Aeson.Encoding
+
+
+import HoogleCommands
+
 main :: IO ()
 main = do
   botToken <- TIO.readFile "most_secret_token_ever"
@@ -22,7 +27,8 @@ main = do
 eventHandler :: Event -> DiscordHandler ()
 eventHandler event = case event of
         MessageCreate m -> when (isCommand m) $ do
-          liftIO $ parseMessage m
+          liftIO $ testCurl
+          -- liftIO $ parseMessage m
           void $ restCall (R.CreateMessage (messageChannelId m) "Pong!")
         _ -> return ()
 
