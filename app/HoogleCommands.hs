@@ -55,7 +55,9 @@ instance ToJSON HoogleJsonResponse where
 
 
 queryHoogleAPIFor :: String -> IO ()
-queryHoogleAPIFor funcName = do
-  response <- httpJSON "https://hoogle.haskell.org?mode=json&hoogle=map&start=1&count=2&format=text" :: IO (Response [HoogleJsonResponse])
+queryHoogleAPIFor targetFuncName = do
+  let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=2&format=text"
+  request <- parseRequest url
+  response <- httpJSON request :: IO (Response [HoogleJsonResponse])
   let responseBody = getResponseBody response
   print responseBody
