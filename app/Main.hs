@@ -27,9 +27,9 @@ main = do
 eventHandler :: Event -> DiscordHandler ()
 eventHandler event = case event of
         MessageCreate m -> when (isCommand m) $ do
-          hoogleResponses <- liftIO $ queryHoogleAPIFor "map"
-          let modifiedResponses = map docs hoogleResponses
-          liftIO $ mapM_ putStrLn modifiedResponses
+          -- hoogleResponses <- liftIO $ queryHoogleAPIFor "map" "2"
+          -- hoogleResponsesDocs <- liftIO $ getFunctionSignatures hoogleResponses
+          -- liftIO $ mapM_ putStrLn hoogleResponsesDocs
           void $ restCall (R.CreateMessage (messageChannelId m) "Pong!")
         _ -> return ()
 

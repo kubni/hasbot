@@ -1,36 +1,43 @@
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DuplicateRecordFields #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedRecordDot #-}
 
 module HoogleCommands (
   HoogleJsonResponse(..),
-  queryHoogleAPIFor
+  queryHoogleAPIFor,
+  getFunctionSignatures
 )
 where
 
 import Data.Aeson
-import Data.Text
+import Data.Text (Text)
+import qualified Data.Text as T
 import GHC.Generics
 import Network.HTTP.Simple
 
-data ModuleInfo = ModuleInfo {
-                                name :: String,
-                                url :: String
-                             } deriving (Show, Generic)
 
-data PackageInfo = PackageInfo {
-                                  name :: String,
-                                  url :: String
-                               } deriving (Show, Generic)
+data ModuleInfo = ModuleInfo
+  {
+    name :: String,
+    url :: String
+  } deriving (Show, Generic)
 
-data HoogleJsonResponse = HoogleJsonResponse {
-                                                docs :: String,
-                                                item :: String,
-                                                moduleInfo :: ModuleInfo,
-                                                packageInfo :: PackageInfo,
-                                                typeInfo :: String,
-                                                url :: String
-                                             } deriving (Show, Generic)
+data PackageInfo = PackageInfo
+  {
+    name :: String,
+    url :: String
+  } deriving (Show, Generic)
+
+data HoogleJsonResponse = HoogleJsonResponse
+  {
+    docs :: String,
+    item :: String,
+    moduleInfo :: ModuleInfo,
+    packageInfo :: PackageInfo,
+    typeInfo :: String,
+    url :: String
+  } deriving (Show, Generic)
 
 
 instance FromJSON ModuleInfo
@@ -64,4 +71,11 @@ queryHoogleAPIFor targetFuncName howManyVersionsToShow = do
 
 
 -- TODO: ...
--- getFunctionSignatures ::
+getFunctionSignatures :: [HoogleJsonResponse] -> [String]
+getFunctionSignatures = map item
+
+
+getImportantInfo :: [HoogleJsonResponse] -> [(String, String, String)]
+getImportantInfo responses = do
+  let info = map (\r -> (item r, r.moduleInfo.name, r.packageInfo.name)) responses
+  info
