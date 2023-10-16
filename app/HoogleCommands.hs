@@ -6,7 +6,7 @@
 module HoogleCommands (
   HoogleJsonResponse(..),
   queryHoogleAPIFor,
-  getFunctionSignatures
+  getImportantInfo
 )
 where
 
@@ -67,7 +67,7 @@ queryHoogleAPIFor targetFuncName howManyVersionsToShow = do
   let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=" ++ howManyVersionsToShow ++ "&format=text"
   request <- parseRequest url
   response <- httpJSON request :: IO (Response [HoogleJsonResponse])
-  pure $ getResponseBody response
+  return $ getResponseBody response
 
 
 -- TODO: ...
@@ -76,6 +76,4 @@ getFunctionSignatures = map item
 
 
 getImportantInfo :: [HoogleJsonResponse] -> [(String, String, String)]
-getImportantInfo responses = do
-  let info = map (\r -> (item r, r.moduleInfo.name, r.packageInfo.name)) responses
-  info
+getImportantInfo = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
