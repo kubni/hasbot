@@ -31,15 +31,16 @@ eventHandler event = case event of
 
           hoogleResponses <- liftIO $ queryHoogleAPIFor "map" "2"
           let importantInfos = getImportantInfoAboutAllImplementations hoogleResponses
-          let formattedInfos = map (\(p, m, s) -> T.pack $ "```json" ++ "\n \
-                                                           \ \"Package\": " ++ p ++ "\n \
-                                                           \ \"Module\": " ++ m ++ "\n \
-                                                           \ \"Signature\": " ++ s ++ "```"
+          let formattedInfos = map (\(p, m, s) -> "```json" ++ "\n \
+                                                  \ \"Package\": " ++ p ++ "\n \
+                                                  \ \"Module\": " ++ m ++ "\n \
+                                                  \ \"Signature\": " ++ s ++ "```"
                                    ) importantInfos
+          let botResponse = concat formattedInfos
           liftIO $ mapM_ print formattedInfos
 
 
-          void $ restCall (R.CreateMessage (messageChannelId m) (head formattedInfos))
+          void $ restCall (R.CreateMessage (messageChannelId m) (T.pack botResponse))
         _ -> return ()
 
 
