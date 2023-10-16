@@ -6,7 +6,7 @@
 module HoogleCommands (
   HoogleJsonResponse(..),
   queryHoogleAPIFor,
-  getImportantInfo
+  getImportantInfoAboutAllImplementations
 )
 where
 
@@ -70,10 +70,9 @@ queryHoogleAPIFor targetFuncName howManyVersionsToShow = do
   return $ getResponseBody response
 
 
--- TODO: ...
 getFunctionSignatures :: [HoogleJsonResponse] -> [String]
 getFunctionSignatures = map item
 
 
-getImportantInfo :: [HoogleJsonResponse] -> [(String, String, String)]
-getImportantInfo = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
+getImportantInfoAboutAllImplementations :: [HoogleJsonResponse] -> [(String, String, String)]
+getImportantInfoAboutAllImplementations = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
