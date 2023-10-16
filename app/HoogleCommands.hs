@@ -5,10 +5,12 @@
 
 module HoogleCommands (
   HoogleJsonResponse(..),
-  produceBotResponseForHoogleCommand
+  produceBotResponseForHoogleCommand,
+  produceBotResponseForHelpCommand
 )
 where
 
+import Data.List
 import Data.Aeson
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -86,3 +88,10 @@ produceBotResponseForHoogleCommand targetFuncName howManyImplementationsToShow =
                                           \ \"Signature\": " ++ s ++ "```"
                             ) importantInfos
   return $ concat formattedInfos
+
+
+getAllAvailableCommands :: [String]
+getAllAvailableCommands = ["hoogle", "help"]
+
+produceBotResponseForHelpCommand :: String
+produceBotResponseForHelpCommand = "Available commands: \n```" ++ intercalate "\n" (map ("- " ++) getAllAvailableCommands) ++ "```"

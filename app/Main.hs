@@ -34,7 +34,14 @@ eventHandler event = case event of
 
 
 
--- TODO: Monadic function chains ?
+notFromBot :: Message -> Bool
+notFromBot m = not $ userIsBot (messageAuthor m)
+
+
+isCommand :: Message -> Bool
+isCommand m = "Hasbot, please " `T.isPrefixOf` (messageContent m)
+
+
 parseCommand :: Message -> IO String
 parseCommand m = do
   let msg = T.unpack $ messageContent m
@@ -43,12 +50,5 @@ parseCommand m = do
 
   case head command of
     "hoogle" -> produceBotResponseForHoogleCommand (command !! 1) (command !! 2)
+    "help"   -> return produceBotResponseForHelpCommand
     _        -> return "Error, not a valid command"
-
-
-notFromBot :: Message -> Bool
-notFromBot m = not $ userIsBot (messageAuthor m)
-
-isCommand :: Message -> Bool
--- isCommand m = "/" `isPrefixOf` (messageContent m)
-isCommand m = "Hasbot, please " `T.isPrefixOf` (messageContent m)
