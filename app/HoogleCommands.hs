@@ -3,6 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module HoogleCommands (
+  HoogleJsonResponse(..),
   queryHoogleAPIFor
 )
 where
@@ -54,10 +55,13 @@ instance ToJSON HoogleJsonResponse where
   toEncoding = genericToEncoding defaultOptions
 
 
-queryHoogleAPIFor :: String -> IO ()
-queryHoogleAPIFor targetFuncName = do
-  let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=2&format=text"
+queryHoogleAPIFor :: String -> String -> IO [HoogleJsonResponse]
+queryHoogleAPIFor targetFuncName howManyVersionsToShow = do
+  let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=" ++ howManyVersionsToShow ++ "&format=text"
   request <- parseRequest url
   response <- httpJSON request :: IO (Response [HoogleJsonResponse])
-  let responseBody = getResponseBody response
-  print responseBody
+  pure $ getResponseBody response
+
+
+-- TODO: ...
+-- getFunctionSignatures ::
