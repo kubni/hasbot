@@ -5,8 +5,7 @@
 
 module HoogleCommands (
   HoogleJsonResponse(..),
-  queryHoogleAPIFor,
-  getImportantInfoAboutAllImplementations
+  produceBotResponseForHoogleCommand
 )
 where
 
@@ -63,8 +62,8 @@ instance ToJSON HoogleJsonResponse where
 
 
 queryHoogleAPIFor :: String -> String -> IO [HoogleJsonResponse]
-queryHoogleAPIFor targetFuncName howManyVersionsToShow = do
-  let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=" ++ howManyVersionsToShow ++ "&format=text"
+queryHoogleAPIFor targetFuncName howManyImplementationsToShow = do
+  let url = "https://hoogle.haskell.org?mode=json&hoogle=" ++ targetFuncName ++ "&start=1&count=" ++ howManyImplementationsToShow ++ "&format=text"
   request <- parseRequest url
   response <- httpJSON request :: IO (Response [HoogleJsonResponse])
   return $ getResponseBody response
@@ -76,3 +75,14 @@ getFunctionSignatures = map item
 
 getImportantInfoAboutAllImplementations :: [HoogleJsonResponse] -> [(String, String, String)]
 getImportantInfoAboutAllImplementations = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
+
+
+produceBotResponseForHoogleCommand targetFuncName howManyImplementationsToShow = do
+  hoogleResponses <- queryHoogleAPIFor targetFuncName howManyImplementationsToShow
+  let importantInfos = getImportantInfoAboutAllImplementations hoogleResponses
+  let formattedInfos = map (\(p, m, s) -> "```json" ++ "\n \
+                                          \ \"Package\": " ++ p ++ "\n \
+                                          \ \"Module\": " ++ m ++ "\n \
+                                          \ \"Signature\": " ++ s ++ "```"
+                            ) importantInfos
+  return $ concat formattedInfos

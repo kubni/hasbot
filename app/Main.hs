@@ -27,33 +27,23 @@ main = do
 
 eventHandler :: Event -> DiscordHandler ()
 eventHandler event = case event of
-        MessageCreate m -> when (isCommand m) $ do
-
-          hoogleResponses <- liftIO $ queryHoogleAPIFor "map" "2"
-          let importantInfos = getImportantInfoAboutAllImplementations hoogleResponses
-          let formattedInfos = map (\(p, m, s) -> "```json" ++ "\n \
-                                                  \ \"Package\": " ++ p ++ "\n \
-                                                  \ \"Module\": " ++ m ++ "\n \
-                                                  \ \"Signature\": " ++ s ++ "```"
-                                   ) importantInfos
-          let botResponse = concat formattedInfos
-          liftIO $ mapM_ print formattedInfos
-
-
+        MessageCreate m -> when (notFromBot m && isCommand m) $ do
+          botResponse <- liftIO $ parseCommand m
           void $ restCall (R.CreateMessage (messageChannelId m) (T.pack botResponse))
         _ -> return ()
 
 
 
 -- TODO: Monadic function chains ?
-parseMessage :: Message -> IO ()
-parseMessage m = when (isCommand m) $ do
+parseCommand :: Message -> IO String
+parseCommand m = do
   let msg = T.unpack $ messageContent m
-  let cmdParts = tail $ words msg
-  let response = if head cmdParts /= "please" then return "You have to be more polite to Hasbot." else tail cmdParts
-  print response
+  let msgParts = words msg
+  let command = drop 2 msgParts -- Get rid of "Hasbot," and "please"
 
-
+  case head command of
+    "hoogle" -> produceBotResponseForHoogleCommand (command !! 1) (command !! 2)
+    _        -> return "Error, not a valid command"
 
 
 notFromBot :: Message -> Bool
@@ -61,4 +51,4 @@ notFromBot m = not $ userIsBot (messageAuthor m)
 
 isCommand :: Message -> Bool
 -- isCommand m = "/" `isPrefixOf` (messageContent m)
-isCommand m = "Hasbot, " `T.isPrefixOf` (messageContent m)
+isCommand m = "Hasbot, please " `T.isPrefixOf` (messageContent m)
