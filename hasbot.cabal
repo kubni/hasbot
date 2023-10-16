@@ -29,6 +29,7 @@ executable hasbot
     -- other-extensions:
     build-depends:    base ^>=4.17.2.0,
                       text,
+                      containers,
                       aeson,
                       unliftio,
                       discord-haskell,
