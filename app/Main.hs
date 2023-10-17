@@ -10,10 +10,10 @@ import           Discord
 import           Discord.Types
 import qualified Discord.Requests as R
 
-import Data.Aeson.Encoding
-
-
 import HasbotCommands
+
+-- Testing
+import Data.List
 
 main :: IO ()
 main = do
@@ -29,7 +29,8 @@ eventHandler :: Event -> DiscordHandler ()
 eventHandler event = case event of
         MessageCreate m -> when (notFromBot m && isCommand m) $ do
           botResponse <- liftIO $ parseCommand m
-          void $ restCall (R.CreateMessage (messageChannelId m) (T.pack botResponse))
+
+          void $ restCall (R.CreateMessage (messageChannelId m) (T.pack $ botResponse))
         _ -> return ()
 
 
@@ -48,6 +49,8 @@ parseCommand m = do
   let msgParts = words msg
   let command = drop 2 msgParts -- Get rid of "Hasbot," and "please"
   case head command of
-    "hoogle" -> produceBotResponseForHoogleCommand (command !! 1) (command !! 2)
+    "hoogle" -> case command !! 2 of
+                  "docs" -> hoogleDocs (command !! 4) (command !! 1) -- Example command: hoogle 2 docs for map
+                  "signatures" -> hoogleSignatures (command !! 4) (command !! 1)
     "help"   -> return produceBotResponseForHelpCommand
     _        -> return "Error, not a valid command"

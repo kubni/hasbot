@@ -5,7 +5,8 @@
 
 module HoogleCommands (
   HoogleJsonResponse(..),
-  produceBotResponseForHoogleCommand
+  hoogleSignatures,
+  hoogleDocs
 )
 where
 
@@ -14,7 +15,6 @@ import Data.Text (Text)
 import qualified Data.Text as T
 import GHC.Generics
 import Network.HTTP.Simple
-
 
 data ModuleInfo = ModuleInfo
   {
@@ -69,22 +69,36 @@ queryHoogleAPIFor targetFuncName howManyImplementationsToShow = do
   return $ getResponseBody response
 
 
-getFunctionSignatures :: [HoogleJsonResponse] -> [String]
-getFunctionSignatures = map item
+indentDocumentation :: String -> String
+indentDocumentation doc = unlines $ map ("\t" ++) $ lines doc
 
 
-getImportantInfoAboutAllImplementations :: [HoogleJsonResponse] -> [(String, String, String)]
-getImportantInfoAboutAllImplementations = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
+getFunctionDocs :: [HoogleJsonResponse] -> [(String, String, String)]
+getFunctionDocs = map (\r -> (r.packageInfo.name, r.moduleInfo.name, indentDocumentation r.docs))
 
 
-produceBotResponseForHoogleCommand targetFuncName howManyImplementationsToShow = do
-  hoogleResponses <- queryHoogleAPIFor targetFuncName howManyImplementationsToShow
-  let importantInfos = getImportantInfoAboutAllImplementations hoogleResponses
+getFunctionSignatures :: [HoogleJsonResponse] -> [(String, String, String)]
+getFunctionSignatures = map (\r -> (r.packageInfo.name, r.moduleInfo.name, r.item))
+
+hoogleDocs :: String -> String -> IO String
+hoogleDocs targetFuncName nImplementations = do
+  hoogleResponses <- queryHoogleAPIFor targetFuncName nImplementations
+  let formattedDocs = map (\(p, m, d) -> "```json\n \
+                                         \\"Package\": " ++ p ++ "\n \
+                                         \\"Module\": " ++ m ++ "\n \
+                                         \\"Documentation\" : \n" ++ d ++ "```"
+                          ) (getFunctionDocs hoogleResponses)
+  return $ concat formattedDocs
+
+hoogleSignatures :: String -> String -> IO String
+hoogleSignatures targetFuncName nImplementations = do
+  hoogleResponses <- queryHoogleAPIFor targetFuncName nImplementations
+  let importantInfos = getFunctionSignatures hoogleResponses
   let formattedInfos = map (\(p, m, s) -> "```json" ++ "\n \
                                           \ \"Package\": " ++ p ++ "\n \
                                           \ \"Module\": " ++ m ++ "\n \
                                           \ \"Signature\": " ++ s ++ "```"
-                            ) importantInfos
+                           ) importantInfos
   return $ concat formattedInfos
 
 
