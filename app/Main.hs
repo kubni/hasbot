@@ -13,7 +13,7 @@ import qualified Discord.Requests as R
 import Data.Aeson.Encoding
 
 
-import HoogleCommands
+import HasbotCommands
 
 main :: IO ()
 main = do
@@ -47,7 +47,6 @@ parseCommand m = do
   let msg = T.unpack $ messageContent m
   let msgParts = words msg
   let command = drop 2 msgParts -- Get rid of "Hasbot," and "please"
-
   case head command of
     "hoogle" -> produceBotResponseForHoogleCommand (command !! 1) (command !! 2)
     "help"   -> return produceBotResponseForHelpCommand
