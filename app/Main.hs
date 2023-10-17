@@ -8,7 +8,9 @@ import qualified Data.Text.IO as TIO
 
 import           Discord
 import           Discord.Types
+import           Discord.Internal.Types.Embed
 import qualified Discord.Requests as R
+
 
 import HasbotCommands
 
@@ -30,7 +32,15 @@ eventHandler event = case event of
         MessageCreate m -> when (notFromBot m && isCommand m) $ do
           botResponse <- liftIO $ parseCommand m
 
-          void $ restCall (R.CreateMessage (messageChannelId m) (T.pack $ botResponse))
+          let opts :: R.MessageDetailedOpts
+              opts =
+                def {
+                      R.messageDetailedEmbeds = Just [ def {
+                                                              createEmbedDescription = T.pack botResponse
+                                                           }
+                                                     ]
+                    }
+          void $ restCall (R.CreateMessageDetailed (messageChannelId m) opts)
         _ -> return ()
 
 
