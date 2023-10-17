@@ -31,7 +31,7 @@ eventHandler :: Event -> DiscordHandler ()
 eventHandler event = case event of
         MessageCreate m -> when (notFromBot m && isCommand m) $ do
           botResponse <- liftIO $ parseCommand m
-
+          liftIO $ print botResponse
           let opts :: R.MessageDetailedOpts
               opts =
                 def {
@@ -58,9 +58,13 @@ parseCommand m = do
   let msg = T.unpack $ messageContent m
   let msgParts = words msg
   let command = drop 2 msgParts -- Get rid of "Hasbot," and "please"
-  case head command of
-    "hoogle" -> case command !! 2 of
-                  "docs" -> hoogleDocs (command !! 4) (command !! 1) -- Example command: hoogle 2 docs for map
-                  "signatures" -> hoogleSignatures (command !! 4) (command !! 1)
-    "help"   -> return produceBotResponseForHelpCommand
-    _        -> return "Error, not a valid command"
+  if null command
+    then return "Error: You need to tell Hasbot what to do."
+    else case head command of
+      "hoogle" -> if length command /= 5
+                  then return "`ERROR`: Wrong usage of Hoogle command.\n Try it like this: `Hasbot, please hoogle 2 docs for map`\n You can also ask Hasbot for help: `Hasbot, please help`"
+                  else case command !! 2 of
+                         "docs"       -> hoogleDocs (command !! 4) (command !! 1) -- Example command: hoogle 2 docs for map
+                         "signatures" -> hoogleSignatures (command !! 4) (command !! 1)
+      "help"   -> return produceBotResponseForHelpCommand
+      _        -> return "`ERROR`: Not a valid command.\nYou can ask Hasbot for help: `Hasbot, please help`"

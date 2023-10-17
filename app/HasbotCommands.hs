@@ -18,12 +18,12 @@ import HoogleCommands
 getAllHasbotCommandsAndTheirDescription :: Map String String
 getAllHasbotCommandsAndTheirDescription = Map.fromList
   [
-    ("∘ hoogle", "-- Search the Haskell API.\n\t\t\t Usage: Hasbot, please hoogle <name> <number_of_implementations>"),
-    ("∘ help", "-- Print all available commands and their short descriptions.\n\t\t\t Usage: Hasbot, please help")
+    ("∘` hoogle`", "-- Search the Haskell API.\n Usage: `Hasbot, please hoogle <number_of> <docs|signatures> for <function_name>`"),
+    ("∘` help`", "-- Print all available commands and their short descriptions.\n Usage: `Hasbot, please help`")
   ]
 
 
 produceBotResponseForHelpCommand :: String
 produceBotResponseForHelpCommand = do
   let l = map (\(k, v) -> k ++ " " ++ v) (Map.toList getAllHasbotCommandsAndTheirDescription)
-  "Available commands: \n```" ++ intercalate "\n" l ++ "```"
+  "Available commands: \n" ++ intercalate "\n" l
