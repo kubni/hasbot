@@ -11,11 +11,7 @@ import           Discord.Types
 import           Discord.Internal.Types.Embed
 import qualified Discord.Requests as R
 
-
 import HasbotCommands
-
--- Testing
-import Data.List
 
 main :: IO ()
 main = do
@@ -63,8 +59,11 @@ parseCommand m = do
     else case head command of
       "hoogle" -> if length command /= 5
                   then return "`ERROR`: Wrong usage of Hoogle command.\n Try it like this: `Hasbot, please hoogle 2 docs for map`\n You can also ask Hasbot for help: `Hasbot, please help`"
-                  else case command !! 2 of
-                         "docs"       -> hoogleDocs (command !! 4) (command !! 1) -- Example command: hoogle 2 docs for map
-                         "signatures" -> hoogleSignatures (command !! 4) (command !! 1)
+                  else if (read (command !! 1) :: Int) > 10
+                       then return "`ERROR`: Getting more than 10 items isn't supported currently."
+                       else
+                        case command !! 2 of
+                                "docs"       -> hoogleDocs (command !! 4) (command !! 1) -- Example command: hoogle 2 docs for map
+                                "signatures" -> hoogleSignatures (command !! 4) (command !! 1)
       "help"   -> return produceBotResponseForHelpCommand
       _        -> return "`ERROR`: Not a valid command.\nYou can ask Hasbot for help: `Hasbot, please help`"

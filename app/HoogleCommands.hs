@@ -95,9 +95,9 @@ hoogleSignatures targetFuncName nImplementations = do
   hoogleResponses <- queryHoogleAPIFor targetFuncName nImplementations
   let importantInfos = getFunctionSignatures hoogleResponses
   let formattedInfos = map (\(p, m, s) -> "```json" ++ "\n \
-                                          \ \"Package\": " ++ p ++ "\n \
-                                          \ \"Module\": " ++ m ++ "\n \
-                                          \ \"Signature\": " ++ s ++ "```"
+                                          \\"Package\": " ++ p ++ "\n \
+                                          \\"Module\": " ++ m ++ "\n \
+                                          \\"Signature\": " ++ s ++ "```"
                            ) importantInfos
   return $ concat formattedInfos
 
