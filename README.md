@@ -1,6 +1,6 @@
 # Hasbot
 
-Hasbot is a Discord bot whose purpose is to search the Haskell API via Hoogle.
+Hasbot is a Discord bot with the purpose of searching Haskell API via Hoogle.
 
 Currently, only function searching is supported.
 
@@ -17,7 +17,7 @@ We can also use it to see the signature of different versions of a function:
 
 
 ## Example 3
-Hasbot also offers help in the times of need:
+Hasbot also offers help in times of need:
 
 ![example3](https://github.com/kubni/hasbot/assets/79210381/a2a88dd1-4407-4d08-be55-676c2508e0e2)
 
